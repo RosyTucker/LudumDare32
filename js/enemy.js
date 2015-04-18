@@ -10,7 +10,6 @@ Enemy = function (totalNum, index, game, player, bullets) {
     this.fireRate = 1000;
     this.nextFire = 0;
     this.alive = true;
-    console.log(x, y);
     this.sprite = game.add.sprite(x, y, 'toast');
     this.sprite.anchor.set(0.5);
     this.sprite.name = index.toString();
