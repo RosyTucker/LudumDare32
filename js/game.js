@@ -1,5 +1,5 @@
 InGameState = function(game){
-    this.game = game
+    this.game = game;
     this.FIRE_RATE = 175;
     this.enemiesTotal = 0;
     this.enemiesAlive = 0;
@@ -126,11 +126,11 @@ InGameState.prototype.fire = function () {
         this.player.animations.stop(null, true);
         this.player.play('toast')
     }
-}
+};
 
 InGameState.prototype.render = function() {
     this.game.debug.text('Enemies: ' + this.enemiesAlive + ' / ' + this.enemiesTotal + '    Health: ' + this.player.health, 32, 32);
-}
+};
 
 
 InGameState.prototype.createPlayer = function () {
