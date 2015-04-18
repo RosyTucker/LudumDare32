@@ -1,12 +1,15 @@
+
+
 GameOverState = function(game){
+    this.didWin = false;
     this.game = game;
 };
 
 GameOverState.prototype.preload = function(){
-   console.log('game over')
 };
 
 GameOverState.prototype.create = function(){
+    console.log('game over: ' + this.didWin);
 };
 
 GameOverState.prototype.update = function (){

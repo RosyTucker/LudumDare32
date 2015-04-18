@@ -99,6 +99,11 @@ InGameState.prototype.update = function (){
         this.numLoops ++;
         this.fire();
     }
+
+    if(this.player.health === 0 || this.enemiesAlive === 0){
+        this.game.state.states['gameOver'].didWin = this.enemiesAlive === 0;
+        this.game.state.start('gameOver');
+    }
 };
 
 InGameState.prototype.enemyShotHitPlayer = function(player, bullet) {
@@ -150,7 +155,7 @@ InGameState.prototype.createPlayer = function () {
     this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.body.drag.set(0.2);
     this.player.body.maxVelocity.setTo(400, 400);
-    this.player.health = 10;
+    this.player.health = 20;
     this.player.body.collideWorldBounds = true;
     this.player.body.setSize(this.player.width, this.player.height * 2 + 20);
 
@@ -162,7 +167,6 @@ InGameState.prototype.createPlayer = function () {
     this.playerAmmo.setAll('anchor.y', 0.5);
     this.playerAmmo.setAll('outOfBoundsKill', true);
     this.playerAmmo.setAll('checkWorldBounds', true);
-    console.log('player Created');
     this.player.play('toast');
 };
 
