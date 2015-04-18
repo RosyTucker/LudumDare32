@@ -30,7 +30,6 @@ InGameState.prototype.create = function(){
     this.createWorkTops();
     this.createEnemies();
     this.game.camera.follow(this.player);
-//    this.game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
     this.game.camera.focusOnXY(0, 0);
     this.cursors = this.game.input.keyboard.createCursorKeys();
 };
@@ -104,6 +103,7 @@ InGameState.prototype.update = function (){
 
 InGameState.prototype.enemyShotHitPlayer = function(player, bullet) {
     bullet.kill();
+    this.player.health --;
 };
 
 InGameState.prototype.playerShotHitEnemy = function(player, bullet) {
@@ -129,8 +129,7 @@ InGameState.prototype.fire = function () {
 }
 
 InGameState.prototype.render = function() {
-//    this.game.debug.text('Active Bullets: ' + this.playerAmmo.countLiving() + ' / ' + this.playerAmmo.length, 32, 32);
-    this.game.debug.text('Enemies: ' + this.enemiesAlive + ' / ' + this.enemiesTotal, 32, 32);
+    this.game.debug.text('Enemies: ' + this.enemiesAlive + ' / ' + this.enemiesTotal + '    Health: ' + this.player.health, 32, 32);
 }
 
 
@@ -151,6 +150,7 @@ InGameState.prototype.createPlayer = function () {
     this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.body.drag.set(0.2);
     this.player.body.maxVelocity.setTo(400, 400);
+    this.player.health = 10;
     this.player.body.collideWorldBounds = true;
     this.player.body.setSize(this.player.width, this.player.height * 2 + 20);
 
