@@ -103,7 +103,7 @@ InGameState.prototype.update = function (){
 
 InGameState.prototype.enemyShotHitPlayer = function(player, bullet) {
     bullet.kill();
-    this.player.health --;
+    this.player.health  = Math.max(0, this.player.health - 1);
 };
 
 InGameState.prototype.playerShotHitEnemy = function(player, bullet) {
