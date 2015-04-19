@@ -37,7 +37,7 @@ Enemy.prototype.update = function() {
             this.nextFire = this.game.time.now + this.fireRate;
             var bullet = this.bullets.getFirstDead();
             bullet.reset(this.sprite.x, this.sprite.y);
-            bullet.rotation = this.game.physics.arcade.moveToObject(bullet, this.player, 500);
+            bullet.rotation = this.game.physics.arcade.moveToObject(bullet, this.player, 150);
         }
     }
 };

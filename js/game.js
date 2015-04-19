@@ -19,6 +19,7 @@ InGameState.prototype.preload = function(){
     this.game.load.image('logo', 'assets/logo.png');
     this.game.load.image('oven', 'assets/oven.png');
     this.game.load.image('toast', 'assets/toast.png');
+    this.game.load.image('broccoli', 'assets/broccoli.png');
     this.game.load.image('ground', 'assets/ground.png');
 };
 
@@ -51,12 +52,13 @@ InGameState.prototype.update = function (){
 
     this.game.physics.arcade.collide(this.player, this.worktops)
     this.game.physics.arcade.overlap(this.enemyAmmo, this.player, this.enemyShotHitPlayer, null, this);
+    this.game.physics.arcade.overlap(this.enemyAmmo, this.playerAmmo, this.enemyAmmoHitPlayerAmmo, null, this);
 
     this.playerAmmo.forEachAlive(function(ammo){
-        this.killIfNeeded(ammo);
+        this.killIfNeeded(ammo, this.enemyAmmo);
     }, this);
     this.enemyAmmo.forEach(function(ammo){
-        this.killIfNeeded(ammo);
+        this.killIfNeeded(ammo, this.playerAmmo);
     }, this);
 
     if (this.cursors.left.isDown){
@@ -71,8 +73,7 @@ InGameState.prototype.update = function (){
         this.currentSpeed -= 4;
     }
 
-    if (this.currentSpeed > 0)
-    {
+    if (this.currentSpeed > 0){
         this.game.physics.arcade.velocityFromRotation(this.player.rotation, this.currentSpeed, this.player.body.velocity);
     }
 
@@ -93,14 +94,18 @@ InGameState.prototype.update = function (){
 };
 
 InGameState.prototype.killIfNeeded = function(ammo) {
-    if(this.game.physics.arcade.collide(this.worktops, ammo)){
-        console.log('killing');
+    if(this.game.physics.arcade.collide(ammo, this.worktops)){
         var tween = this.game.add.tween(ammo).to({alpha:0}, 300).start();
         tween.onComplete.add(function(){
             ammo.kill();
             ammo.alpha = 1;
         })
     }
+};
+
+InGameState.prototype.enemyAmmoHitPlayerAmmo = function(playerAmmo, enemyAmmo) {
+    playerAmmo.kill();
+    enemyAmmo.kill();
 };
 
 InGameState.prototype.enemyShotHitPlayer = function(player, ammo) {
@@ -202,7 +207,7 @@ InGameState.prototype.createEnemies = function () {
     this.enemyAmmo = this.game.add.group();
     this.enemyAmmo.enableBody = true;
     this.enemyAmmo.physicsBodyType = Phaser.Physics.ARCADE;
-    this.enemyAmmo.createMultiple(30, 'toast');
+    this.enemyAmmo.createMultiple(30, 'broccoli');
     this.enemyAmmo.setAll('anchor.x', 0.5);
     this.enemyAmmo.setAll('anchor.y', 0.5);
     this.enemyAmmo.setAll('outOfBoundsKill', true);
