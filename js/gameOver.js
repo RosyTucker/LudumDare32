@@ -16,8 +16,7 @@ GameOverState.prototype.preload = function(){
 };
 
 GameOverState.prototype.create = function(){
-    this.game.stage.setBackgroundColor('#B8D973ff');
-    console.log('game over: ' + this.didWin);
+    this.game.stage.setBackgroundColor('#000000');
     this.createText();
 };
 
@@ -33,7 +32,7 @@ GameOverState.prototype.render = function() {
 GameOverState.prototype.createText = function () {
     var result = 'Lost :(';
     if(this.didWin) result = 'Won :D';
-    var text = this.game.add.text(500,350, "Game Over \n You " + result + '\n\n Click to play again!');
+    var text = this.game.add.text(400,300, "Game Over \n You " + result + '\n\n Click to play again!');
     text.anchor.setTo(0.5);
 
     text.font = 'Revalia';

@@ -20,6 +20,8 @@ InGameState.prototype.preload = function(){
     this.game.load.image('oven', 'assets/oven.png');
     this.game.load.image('toast', 'assets/toast.png');
     this.game.load.image('broccoli', 'assets/broccoli.png');
+    this.game.load.image('explosion', 'assets/jamExplosion.png');
+    this.game.load.image('enemy', 'assets/fryingPan.png');
     this.game.load.image('ground', 'assets/ground.png');
 };
 
@@ -30,6 +32,10 @@ InGameState.prototype.create = function(){
     this.createPlayer();
     this.createWorkTops();
     this.createEnemies();
+
+    this.explosions = this.game.add.group();
+    this.explosions.createMultiple(10, 'explosion');
+    console.log(this.explosions);
     this.game.camera.follow(this.player);
     this.game.camera.focusOnXY(0, 0);
     this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -50,7 +56,7 @@ InGameState.prototype.update = function (){
         }
     }
 
-    this.game.physics.arcade.collide(this.player, this.worktops)
+    this.game.physics.arcade.collide(this.player, this.worktops);
     this.game.physics.arcade.overlap(this.enemyAmmo, this.player, this.enemyShotHitPlayer, null, this);
     this.game.physics.arcade.overlap(this.enemyAmmo, this.playerAmmo, this.enemyAmmoHitPlayerAmmo, null, this);
 
@@ -113,11 +119,19 @@ InGameState.prototype.enemyShotHitPlayer = function(player, ammo) {
     this.player.health  = Math.max(0, this.player.health - 1);
 };
 
-InGameState.prototype.playerShotHitEnemy = function(player, ammo) {
+InGameState.prototype.playerShotHitEnemy = function(enemy, ammo) {
     ammo.kill();
-    var destroyed = this.enemies[player.name].damage();
+    var destroyed = this.enemies[enemy.name].damage();
     if (destroyed){
-        //do something
+        var explosion = this.explosions.getFirstExists(false);
+        explosion.scaleXY = 0.1;
+        explosion.alpha = 1;
+        explosion.reset(enemy.x, enemy.y);
+        var tween = this.game.add.tween(explosion).to({scaleXY:1, alpha: 0}, 1000,
+            Phaser.Easing.Sinusoidal.Out).start();
+        tween.onComplete.add(function(){
+            explosion.kill();
+        })
     }
 };
 
@@ -218,3 +232,12 @@ InGameState.prototype.createEnemies = function () {
         this.enemies.push(new Enemy(this.enemiesTotal, i, this.game, this.player, this.enemyAmmo));
     }
 };
+
+Object.defineProperty(Phaser.Sprite.prototype, 'scaleXY', {
+    get: function() {
+        return this.scale.x;
+    },
+    set: function(v) {
+        this.scale.set(v, v);
+    }
+});
