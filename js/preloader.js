@@ -5,13 +5,13 @@ function Preloader(game)
 
 Preloader.prototype.preload = function() {
     var menuState = new MenuState(this.game);
-    var inGameState = new InGameState(this.game);
+    var gameState = new GameState(this.game);
     var gameOverState = new GameOverState(this.game);
     menuState.preload();
-    inGameState.preload();
+    gameState.preload();
     gameOverState.preload();
     this.game.state.add('menu', menuState);
-    this.game.state.add('inGame', inGameState);
+    this.game.state.add('inGame', gameState);
     this.game.state.add('gameOver', gameOverState);
 };
 

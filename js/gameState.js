@@ -1,4 +1,4 @@
-InGameState = function(game){
+GameState = function(game){
     this.game = game;
     this.FIRE_RATE = 175;
     this.currentSpeed = 0;
@@ -6,7 +6,7 @@ InGameState = function(game){
     this.nextFire = 0;
 };
 
-InGameState.prototype.preload = function(){
+GameState.prototype.preload = function(){
     this.game.load.image('sink', 'assets/sink.png');
     this.game.load.image('bin', 'assets/bin.png');
     this.game.load.image('cabinet2', 'assets/cabinet2.png');
@@ -29,7 +29,7 @@ InGameState.prototype.preload = function(){
     this.game.load.audio('music', 'assets/sounds/music.m4a');
 };
 
-InGameState.prototype.create = function(){
+GameState.prototype.create = function(){
     this.game.world.setBounds(0, 0, 1600, 1200);
     this.ground = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'ground');
     this.ground.fixedToCamera = true;
@@ -48,7 +48,7 @@ InGameState.prototype.create = function(){
     this.cursors = this.game.input.keyboard.createCursorKeys();
 };
 
-InGameState.prototype.update = function (){
+GameState.prototype.update = function (){
     this.enemiesAlive = 0;
 
     for (var i = 0; i < this.enemies.length; i++)
@@ -117,7 +117,7 @@ InGameState.prototype.update = function (){
     }
 };
 
-InGameState.prototype.killIfNeeded = function(ammo) {
+GameState.prototype.killIfNeeded = function(ammo) {
     if(this.game.physics.arcade.collide(ammo, this.worktops)){
         var tween = this.game.add.tween(ammo).to({alpha:0}, 300).start();
         tween.onComplete.add(function(){
@@ -127,12 +127,12 @@ InGameState.prototype.killIfNeeded = function(ammo) {
     }
 };
 
-InGameState.prototype.enemyAmmoHitPlayerAmmo = function(playerAmmo, enemyAmmo) {
+GameState.prototype.enemyAmmoHitPlayerAmmo = function(playerAmmo, enemyAmmo) {
     playerAmmo.kill();
     enemyAmmo.kill();
 };
 
-InGameState.prototype.enemyShotHitPlayer = function(player, ammo) {
+GameState.prototype.enemyShotHitPlayer = function(player, ammo) {
     ammo.kill();
     this.hitfx.play('',0,0.7,false);
     var tween = this.game.add.tween(player).to({alpha: 0.6}, 100,
@@ -143,7 +143,7 @@ InGameState.prototype.enemyShotHitPlayer = function(player, ammo) {
     this.player.health  = Math.max(0, this.player.health - 1);
 };
 
-InGameState.prototype.playerShotHitEnemy = function(enemy, ammo) {
+GameState.prototype.playerShotHitEnemy = function(enemy, ammo) {
     ammo.kill();
     var destroyed = this.enemies[enemy.name].damage();
     if (destroyed){
@@ -163,7 +163,7 @@ InGameState.prototype.playerShotHitEnemy = function(enemy, ammo) {
     }
 };
 
-InGameState.prototype.fire = function () {
+GameState.prototype.fire = function () {
     if (this.game.time.now > this.nextFire && this.playerAmmo.countDead() > 0)
     {
         this.nextFire = this.game.time.now + this.FIRE_RATE;
@@ -178,11 +178,11 @@ InGameState.prototype.fire = function () {
     }
 };
 
-InGameState.prototype.render = function() {
+GameState.prototype.render = function() {
     this.game.debug.text('Enemies: ' + this.enemiesAlive + ' / ' + this.enemiesTotal + '    Health: ' + this.player.health + '     Total Kills: ' + this.kills, 32, 32);
 };
 
-InGameState.prototype.createPlayer = function () {
+GameState.prototype.createPlayer = function () {
     this.player = this.game.add.sprite(0, 0,'player', 'player1.png');
     this.player.anchor.setTo(0.5, 0.5);
     this.playerAnimation = this.player.animations.add('toast', ['player1.png', 'player1.png','player1.png',
@@ -216,7 +216,7 @@ InGameState.prototype.createPlayer = function () {
     this.player.play('toast');
 };
 
-InGameState.prototype.createWorkTops = function() {
+GameState.prototype.createWorkTops = function() {
     this.worktops = this.game.add.group(undefined, 'group', false, true, Phaser.Physics.ARCADE);
 
     var cabinet = this.worktops.create(0, 0,'cabinet');
@@ -241,7 +241,7 @@ InGameState.prototype.createWorkTops = function() {
     this.worktops.create((cabinet.width*3),(cabinet.height * 4),'cabinet').body.immovable = true;
 };
 
-InGameState.prototype.createEnemies = function () {
+GameState.prototype.createEnemies = function () {
     this.enemiesTotal = 0;
     this.enemiesAlive = 0;
     this.enemyAmmo = this.game.add.group();
@@ -255,7 +255,7 @@ InGameState.prototype.createEnemies = function () {
     this.addEnemies(10);
 };
 
-InGameState.prototype.addEnemies = function(number){
+GameState.prototype.addEnemies = function(number){
     for (var i = this.enemiesTotal; i < this.enemiesTotal + number; i++){
         this.enemies.push(new Enemy(this.enemiesTotal + number, i, this.game, this.player, this.enemyAmmo));
     }
