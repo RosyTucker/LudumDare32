@@ -109,7 +109,6 @@ InGameState.prototype.update = function (){
     }
 
     if(this.enemiesAlive === 0){
-        this.addEnemies(3);
         var total = this.enemiesTotal;
         this.enemies.forEach(function (enemy, index){
             enemy.reset(total, enemy.speed * 1.5, index);
@@ -134,6 +133,12 @@ InGameState.prototype.enemyAmmoHitPlayerAmmo = function(playerAmmo, enemyAmmo) {
 
 InGameState.prototype.enemyShotHitPlayer = function(player, ammo) {
     ammo.kill();
+    this.hitfx.play('',0,0.7,false);
+    var tween = this.game.add.tween(player).to({alpha: 0.6}, 100,
+        Phaser.Easing.Circular.InOut).start();
+    tween.onComplete.add(function(){
+        player.alpha = 1;
+    })
     this.player.health  = Math.max(0, this.player.health - 1);
 };
 
