@@ -1,7 +1,7 @@
 Enemy = function (totalNum, index, game, player, bullets) {
 
-    var x = (game.world.width/totalNum * (index + 0.75)) - game.world.width/2;
-    var y = game.world.height/2;
+    var x = (game.world.width/totalNum * (index + 0.75));
+    var y = game.world.height;
 
     this.game = game;
     this.health = 3;
@@ -31,7 +31,7 @@ Enemy.prototype.damage = function() {
 }
 
 Enemy.prototype.update = function() {
-    this.sprite.rotation = this.game.physics.arcade.moveToObject(this.sprite, this.player, 20);
+    this.sprite.rotation = this.game.physics.arcade.moveToObject(this.sprite, this.player, 50);
     if (this.game.physics.arcade.distanceBetween(this.sprite, this.player) < 400) {
         if (this.game.time.now > this.nextFire && this.bullets.countDead() > 0){
             this.nextFire = this.game.time.now + this.fireRate;

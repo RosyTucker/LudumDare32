@@ -23,8 +23,8 @@ InGameState.prototype.preload = function(){
 };
 
 InGameState.prototype.create = function(){
-    this.game.world.setBounds(-550, -400, 1100, 800);
-    this.ground = this.game.add.tileSprite(0, 0, 1100, 800, 'ground');
+    this.game.world.setBounds(0, 0, 1600, 1200);
+    this.ground = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'ground');
     this.ground.fixedToCamera = true;
     this.createPlayer();
     this.createWorkTops();
@@ -50,27 +50,13 @@ InGameState.prototype.update = function (){
     }
 
     this.game.physics.arcade.collide(this.player, this.worktops)
-    this.game.physics.arcade.collide(this.worktops, this.enemyAmmo)
     this.game.physics.arcade.overlap(this.enemyAmmo, this.player, this.enemyShotHitPlayer, null, this);
 
-    this.playerAmmo.forEachAlive(function(toast){
-        if(this.game.physics.arcade.collide(this.worktops, toast)){
-            var tween = this.game.add.tween(toast).to({alpha:0}, 300).start();
-            tween.onComplete.add(function(){
-                toast.kill();
-                toast.alpha = 1;
-            })
-        }
+    this.playerAmmo.forEachAlive(function(ammo){
+        this.killIfNeeded(ammo);
     }, this);
-
-    this.enemyAmmo.forEachAlive(function(toast){
-        if(this.game.physics.arcade.collide(this.worktops, this.toast)){
-            var tween = this.game.add.tween(toast).to({alpha:0}, 300).start();
-            tween.onComplete.add(function(){
-                toast.kill();
-                toast.alpha = 1;
-            })
-        }
+    this.enemyAmmo.forEach(function(ammo){
+        this.killIfNeeded(ammo);
     }, this);
 
     if (this.cursors.left.isDown){
@@ -106,13 +92,24 @@ InGameState.prototype.update = function (){
     }
 };
 
-InGameState.prototype.enemyShotHitPlayer = function(player, bullet) {
-    bullet.kill();
+InGameState.prototype.killIfNeeded = function(ammo) {
+    if(this.game.physics.arcade.collide(this.worktops, ammo)){
+        console.log('killing');
+        var tween = this.game.add.tween(ammo).to({alpha:0}, 300).start();
+        tween.onComplete.add(function(){
+            ammo.kill();
+            ammo.alpha = 1;
+        })
+    }
+};
+
+InGameState.prototype.enemyShotHitPlayer = function(player, ammo) {
+    ammo.kill();
     this.player.health  = Math.max(0, this.player.health - 1);
 };
 
-InGameState.prototype.playerShotHitEnemy = function(player, bullet) {
-    bullet.kill();
+InGameState.prototype.playerShotHitEnemy = function(player, ammo) {
+    ammo.kill();
     var destroyed = this.enemies[player.name].damage();
     if (destroyed){
         //do something
@@ -134,12 +131,16 @@ InGameState.prototype.fire = function () {
 };
 
 InGameState.prototype.render = function() {
+//    this.enemyAmmo.forEachAlive(function(member){this.game.debug.body(member)}
+//    , this);
+//    this.worktops.forEachAlive(function(member){this.game.debug.body(member)}
+//        , this);
+//    this.game.debug.body(this.player);
     this.game.debug.text('Enemies: ' + this.enemiesAlive + ' / ' + this.enemiesTotal + '    Health: ' + this.player.health, 32, 32);
 };
 
-
 InGameState.prototype.createPlayer = function () {
-    this.player = this.game.add.sprite(0, -250,'player', 'player1.png');
+    this.player = this.game.add.sprite(0, 0,'player', 'player1.png');
     this.player.anchor.setTo(0.5, 0.5);
     this.playerAnimation = this.player.animations.add('toast', ['player1.png', 'player1.png','player1.png',
         'player2.png', 'player2.png', 'player2.png', 'player2.png', 'player2.png',
@@ -155,10 +156,11 @@ InGameState.prototype.createPlayer = function () {
     this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.body.drag.set(0.2);
     this.player.body.maxVelocity.setTo(400, 400);
+    this.player.position = new Phaser.Point(600,250);
     this.player.health = 20;
     this.player.body.collideWorldBounds = true;
     this.player.body.setSize(this.player.width, this.player.height * 2 + 20);
-
+    this.player.scale.setTo(0.8,0.8);
     this.playerAmmo = this.game.add.group();
     this.playerAmmo.enableBody = true;
     this.playerAmmo.physicsBodyType = Phaser.Physics.ARCADE;
@@ -172,18 +174,27 @@ InGameState.prototype.createPlayer = function () {
 
 InGameState.prototype.createWorkTops = function() {
     this.worktops = this.game.add.group(undefined, 'group', false, true, Phaser.Physics.ARCADE);
-    var cabinet = this.worktops.create(-550, -400,'cabinet');
+
+    var cabinet = this.worktops.create(0, 0,'cabinet');
     cabinet.body.immovable = true;
-    this.worktops.create(-550 + cabinet.width, -400,'sink').body.immovable = true;
-    this.worktops.create(-550 + (cabinet.width*2), -400,'drainingBoard').body.immovable = true;
-    this.worktops.create(-550 + (cabinet.width*3), -400,'cabinet').body.immovable = true;
-    this.worktops.create(-550 + (cabinet.width*4), -400,'cabinet2').body.immovable = true;
-    this.worktops.create(-550 + (cabinet.width*5), -400,'oven').body.immovable = true;
-    this.worktops.create(-550 + (cabinet.width*6), -400,'cabinet').body.immovable = true;
-    this.worktops.create(-550, -400 + cabinet.height,'cabinet').body.immovable = true;
-    this.worktops.create(-550, -400 + (cabinet.height * 2),'cabinet').body.immovable = true;
-    this.worktops.create(-550, -400 + (cabinet.height* 3),'fridge').body.immovable = true;
-    this.worktops.create(-550, -400 + (cabinet.height* 4),'bin').body.immovable = true;
+    this.worktops.create(cabinet.width, 0,'sink').body.immovable = true;
+    this.worktops.create(cabinet.width, 0,'sink').body.immovable = true;
+    this.worktops.create((cabinet.width*2),0,'drainingBoard').body.immovable = true;
+    this.worktops.create((cabinet.width*3),0,'cabinet').body.immovable = true;
+    this.worktops.create((cabinet.width*4),0, 'cabinet2').body.immovable = true;
+    this.worktops.create((cabinet.width*5), 0,'oven').body.immovable = true;
+    this.worktops.create((cabinet.width*6), 0,'cabinet').body.immovable = true;
+    this.worktops.create(0, cabinet.height,'cabinet').body.immovable = true;
+    this.worktops.create(0, (cabinet.height * 2),'cabinet').body.immovable = true;
+    this.worktops.create(0, (cabinet.height* 3),'fridge').body.immovable = true;
+    this.worktops.create(0, (cabinet.height* 4),'bin').body.immovable = true;
+
+    this.worktops.create((cabinet.width*3),  (cabinet.height * 3),'cabinet').body.immovable = true;
+    this.worktops.create((cabinet.width*4),(cabinet.height * 4),'cabinet').body.immovable = true;
+    this.worktops.create((cabinet.width*4),(cabinet.height * 3),'cabinet').body.immovable = true;
+    this.worktops.create((cabinet.width*5),(cabinet.height * 4),'cabinet').body.immovable = true;
+    this.worktops.create((cabinet.width*5),(cabinet.height * 3),'cabinet').body.immovable = true;
+    this.worktops.create((cabinet.width*3),(cabinet.height * 4),'cabinet').body.immovable = true;
 };
 
 
@@ -191,13 +202,10 @@ InGameState.prototype.createEnemies = function () {
     this.enemyAmmo = this.game.add.group();
     this.enemyAmmo.enableBody = true;
     this.enemyAmmo.physicsBodyType = Phaser.Physics.ARCADE;
-    this.enemyAmmo.createMultiple(100, 'toast');
-
+    this.enemyAmmo.createMultiple(30, 'toast');
     this.enemyAmmo.setAll('anchor.x', 0.5);
     this.enemyAmmo.setAll('anchor.y', 0.5);
     this.enemyAmmo.setAll('outOfBoundsKill', true);
-    this.enemyAmmo.setAll('checkWorldBounds', true);
-
     this.enemies = [];
     this.enemiesTotal = 10;
     this.enemiesAlive = 10;
