@@ -7,7 +7,7 @@ WebFontConfig = {
 };
 
 GameOverState = function(game){
-    this.didWin = false;
+    this.totalKills = 0;
     this.game = game;
 };
 
@@ -30,9 +30,7 @@ GameOverState.prototype.render = function() {
 };
 
 GameOverState.prototype.createText = function () {
-    var result = 'Lost :(';
-    if(this.didWin) result = 'Won :D';
-    var text = this.game.add.text(400,300, "Game Over \n You " + result + '\n\n Click to play again!');
+    var text = this.game.add.text(400,300, "Game Over \n You Scored: " + this.totalKills + '\n\n Click to play again!');
     text.anchor.setTo(0.5);
 
     text.font = 'Revalia';

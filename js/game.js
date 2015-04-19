@@ -1,8 +1,6 @@
 InGameState = function(game){
     this.game = game;
     this.FIRE_RATE = 175;
-    this.enemiesTotal = 0;
-    this.enemiesAlive = 0;
     this.currentSpeed = 0;
     this.numLoops = 0;
     this.nextFire = 0;
@@ -34,6 +32,7 @@ InGameState.prototype.create = function(){
     this.game.world.setBounds(0, 0, 1600, 1200);
     this.ground = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'ground');
     this.ground.fixedToCamera = true;
+    this.kills = 0;
     this.createPlayer();
     this.createWorkTops();
     this.createEnemies();
@@ -108,9 +107,17 @@ InGameState.prototype.update = function (){
         this.fire();
     }
 
-    if(this.player.health === 0 || this.enemiesAlive === 0){
-        this.game.state.states['gameOver'].didWin = this.enemiesAlive === 0;
+    if(this.player.health === 0){
+        this.game.state.states['gameOver'].totalKills = this.kills;
         this.game.state.start('gameOver');
+    }
+
+    if(this.enemiesAlive === 0){
+        this.addEnemies(3);
+        var total = this.enemiesTotal;
+        this.enemies.forEach(function (enemy, index){
+            enemy.reset(total, enemy.speed * 1.5, index);
+        });
     }
 };
 
@@ -138,18 +145,19 @@ InGameState.prototype.playerShotHitEnemy = function(enemy, ammo) {
     ammo.kill();
     var destroyed = this.enemies[enemy.name].damage();
     if (destroyed){
+        this.kills++;
         var explosion = this.explosions.getFirstExists(false);
         explosion.scaleXY = 0.1;
         explosion.alpha = 1;
         explosion.reset(enemy.x, enemy.y);
         var tween = this.game.add.tween(explosion).to({scaleXY:1, alpha: 0}, 1000,
             Phaser.Easing.Sinusoidal.Out).start();
-        this.splodgefx.play('',0,1,false);
+        this.splodgefx.play('',0,0.7,false);
         tween.onComplete.add(function(){
             explosion.kill();
         })
     }else{
-        this.hitfx.play('',0,1,false);
+        this.hitfx.play('',0,0.7,false);
     }
 };
 
@@ -169,12 +177,7 @@ InGameState.prototype.fire = function () {
 };
 
 InGameState.prototype.render = function() {
-//    this.enemyAmmo.forEachAlive(function(member){this.game.debug.body(member)}
-//    , this);
-//    this.worktops.forEachAlive(function(member){this.game.debug.body(member)}
-//        , this);
-//    this.game.debug.body(this.player);
-    this.game.debug.text('Enemies: ' + this.enemiesAlive + ' / ' + this.enemiesTotal + '    Health: ' + this.player.health, 32, 32);
+    this.game.debug.text('Enemies: ' + this.enemiesAlive + ' / ' + this.enemiesTotal + '    Health: ' + this.player.health + '     Total Kills: ' + this.kills, 32, 32);
 };
 
 InGameState.prototype.createPlayer = function () {
@@ -196,6 +199,7 @@ InGameState.prototype.createPlayer = function () {
     this.player.body.maxVelocity.setTo(400, 400);
     this.player.position = new Phaser.Point(600,250);
     this.player.health = 20;
+    this.player.friction = 0.2;
     this.player.body.collideWorldBounds = true;
     this.player.body.setSize(this.player.width, this.player.height * 2 + 20);
     this.player.scale.setTo(0.8,0.8);
@@ -235,8 +239,9 @@ InGameState.prototype.createWorkTops = function() {
     this.worktops.create((cabinet.width*3),(cabinet.height * 4),'cabinet').body.immovable = true;
 };
 
-
 InGameState.prototype.createEnemies = function () {
+    this.enemiesTotal = 0;
+    this.enemiesAlive = 0;
     this.enemyAmmo = this.game.add.group();
     this.enemyAmmo.enableBody = true;
     this.enemyAmmo.physicsBodyType = Phaser.Physics.ARCADE;
@@ -245,11 +250,16 @@ InGameState.prototype.createEnemies = function () {
     this.enemyAmmo.setAll('anchor.y', 0.5);
     this.enemyAmmo.setAll('outOfBoundsKill', true);
     this.enemies = [];
-    this.enemiesTotal = 10;
-    this.enemiesAlive = 10;
-    for (var i = 0; i < this.enemiesTotal; i++){
-        this.enemies.push(new Enemy(this.enemiesTotal, i, this.game, this.player, this.enemyAmmo));
+    this.addEnemies(10);
+};
+
+InGameState.prototype.addEnemies = function(number){
+    for (var i = this.enemiesTotal; i < this.enemiesTotal + number; i++){
+        this.enemies.push(new Enemy(this.enemiesTotal + number, i, this.game, this.player, this.enemyAmmo));
     }
+    this.enemiesTotal += number;
+    this.enemiesAlive += number;
+
 };
 
 Object.defineProperty(Phaser.Sprite.prototype, 'scaleXY', {
