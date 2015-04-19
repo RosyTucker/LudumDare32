@@ -1,6 +1,6 @@
 Enemy = function (totalNum, index, game, player, bullets) {
 
-    var x = (game.world.width/totalNum * (index + 0.75));
+    var x = (game.world.width/totalNum * index);
     var y = game.world.height;
     this.game = game;
     this.initialHealth = 2;
