@@ -1,7 +1,7 @@
 
 WebFontConfig = {
     google: {
-        families: ['Revalia']
+        families: ['Open Sans']
     }
 
 };
@@ -16,7 +16,7 @@ GameOverState.prototype.preload = function(){
 };
 
 GameOverState.prototype.create = function(){
-    this.game.stage.setBackgroundColor('#000000');
+    this.game.stage.setBackgroundColor('#1d1a16');
     this.createText();
 };
 
@@ -32,22 +32,9 @@ GameOverState.prototype.render = function() {
 GameOverState.prototype.createText = function () {
     var text = this.game.add.text(400,300, "Game Over \n You Scored: " + this.totalKills + '\n\n Click to play again!');
     text.anchor.setTo(0.5);
-
-    text.font = 'Revalia';
+    text.fill = '#cd6871';
+    text.font = 'Open Sans';
+    text.fontWeight = 600;
     text.fontSize = 60;
-
     text.align = 'center';
-    text.fill = '#FFFFFF';
-    text.stroke = '#000000';
-    text.strokeThickness = 2;
-    text.setShadow(5, 5, 'rgba(0,0,0,0.5)', 5);
-
-    text.inputEnabled = true;
-    text.events.onInputOver.add(function(){
-        text.fill = '#6A665A';
-    }, this);
-    text.events.onInputOut.add(function(){
-        text.fill = '#FFFFFF';
-    }, this);
-
 };

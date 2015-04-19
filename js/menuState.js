@@ -1,7 +1,7 @@
 
 WebFontConfig = {
     google: {
-        families: ['Revalia']
+        families: ['Open Sans']
     }
 
 };
@@ -16,7 +16,7 @@ MenuState.prototype.preload = function(){
 };
 
 MenuState.prototype.create = function(){
-    this.ground = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'ground');
+    this.game.stage.setBackgroundColor('#1d1a16');
     this.createText();
 };
 
@@ -32,18 +32,9 @@ MenuState.prototype.render = function() {
 MenuState.prototype.createText = function () {
     var text = this.game.add.text(410,300, 'You\'re Toast! \n Click to Play!');
     text.anchor.setTo(0.5);
-
-    text.font = 'Revalia';
-    text.fontWeight = 800;
+    text.fill = '#cd6871';
+    text.font = 'Open Sans';
+    text.fontWeight = 600;
     text.fontSize = 60;
     text.align = 'center';
-    text.fill = '#A7DCC7';
-    text.inputEnabled = true;
-    text.events.onInputOver.add(function(){
-        text.fill = '#B8D973';
-    }, this);
-    text.events.onInputOut.add(function(){
-        text.fill = '#A7DCC7';
-    }, this);
-
 };
