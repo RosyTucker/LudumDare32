@@ -13,6 +13,7 @@ InGameState.prototype.preload = function(){
     this.game.load.image('fridge', 'assets/fridge.png');
     this.game.load.image('drainingBoard', 'assets/drainingBoard.png');
     this.game.load.image('cabinet', 'assets/cabinet.png');
+    this.game.load.image('cabinet3', 'assets/cabinet3.png');
     this.game.load.atlas('player', 'assets/player/player.png', 'assets/player/player.json');
     this.game.load.image('logo', 'assets/logo.png');
     this.game.load.image('oven', 'assets/oven.png');
@@ -42,14 +43,9 @@ InGameState.prototype.create = function(){
     this.hitfx = this.game.add.audio('hit');
     this.explosions = this.game.add.group();
     this.explosions.createMultiple(10, 'explosion');
-    console.log(this.explosions);
     this.game.camera.follow(this.player);
     this.game.camera.focusOnXY(0, 0);
     this.cursors = this.game.input.keyboard.createCursorKeys();
-    if(!this.music) {
-        this.music = this.game.add.audio('music');
-        this.music.play('', 0, 0.5, true);
-    }
 };
 
 InGameState.prototype.update = function (){
@@ -233,7 +229,7 @@ InGameState.prototype.createWorkTops = function() {
 
     this.worktops.create((cabinet.width*3),  (cabinet.height * 3),'cabinet').body.immovable = true;
     this.worktops.create((cabinet.width*4),(cabinet.height * 4),'cabinet').body.immovable = true;
-    this.worktops.create((cabinet.width*4),(cabinet.height * 3),'cabinet').body.immovable = true;
+    this.worktops.create((cabinet.width*4),(cabinet.height * 3),'cabinet3').body.immovable = true;
     this.worktops.create((cabinet.width*5),(cabinet.height * 4),'cabinet').body.immovable = true;
     this.worktops.create((cabinet.width*5),(cabinet.height * 3),'cabinet').body.immovable = true;
     this.worktops.create((cabinet.width*3),(cabinet.height * 4),'cabinet').body.immovable = true;
