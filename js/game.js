@@ -109,6 +109,7 @@ InGameState.prototype.update = function (){
     }
 
     if(this.enemiesAlive === 0){
+        this.addEnemies(3);
         var total = this.enemiesTotal;
         this.enemies.forEach(function (enemy, index){
             enemy.reset(total, enemy.speed * 1.5, index);
