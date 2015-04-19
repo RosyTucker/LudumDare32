@@ -23,6 +23,11 @@ InGameState.prototype.preload = function(){
     this.game.load.image('explosion', 'assets/jamExplosion.png');
     this.game.load.image('enemy', 'assets/fryingPan.png');
     this.game.load.image('ground', 'assets/ground.png');
+    this.game.load.audio('splodge', 'assets/sounds/splodge.m4a');
+    this.game.load.audio('fire', 'assets/sounds/fire.m4a');
+    this.game.load.audio('shuffle', 'assets/sounds/shuffle.m4a');
+    this.game.load.audio('hit', 'assets/sounds/hit.m4a');
+    this.game.load.audio('music', 'assets/sounds/music.m4a');
 };
 
 InGameState.prototype.create = function(){
@@ -32,13 +37,20 @@ InGameState.prototype.create = function(){
     this.createPlayer();
     this.createWorkTops();
     this.createEnemies();
-
+    this.splodgefx = this.game.add.audio('splodge');
+    this.firefx = this.game.add.audio('fire');
+    this.shufflefx = this.game.add.audio('shuffle');
+    this.hitfx = this.game.add.audio('hit');
     this.explosions = this.game.add.group();
     this.explosions.createMultiple(10, 'explosion');
     console.log(this.explosions);
     this.game.camera.follow(this.player);
     this.game.camera.focusOnXY(0, 0);
     this.cursors = this.game.input.keyboard.createCursorKeys();
+    if(!this.music) {
+        this.music = this.game.add.audio('music');
+        this.music.play('', 0, 0.5, true);
+    }
 };
 
 InGameState.prototype.update = function (){
@@ -81,6 +93,9 @@ InGameState.prototype.update = function (){
 
     if (this.currentSpeed > 0){
         this.game.physics.arcade.velocityFromRotation(this.player.rotation, this.currentSpeed, this.player.body.velocity);
+        this.shufflefx.play('',0,0.4,false, false);
+    }else{
+        this.shufflefx.pause();
     }
 
     this.ground.tilePosition.x = -this.game.camera.x;
@@ -129,9 +144,12 @@ InGameState.prototype.playerShotHitEnemy = function(enemy, ammo) {
         explosion.reset(enemy.x, enemy.y);
         var tween = this.game.add.tween(explosion).to({scaleXY:1, alpha: 0}, 1000,
             Phaser.Easing.Sinusoidal.Out).start();
+        this.splodgefx.play('',0,1,false);
         tween.onComplete.add(function(){
             explosion.kill();
         })
+    }else{
+        this.hitfx.play('',0,1,false);
     }
 };
 
@@ -140,6 +158,7 @@ InGameState.prototype.fire = function () {
     {
         this.nextFire = this.game.time.now + this.FIRE_RATE;
         var toast = this.playerAmmo.getFirstExists(false);
+        this.firefx.play('',0,0.15,false);
         toast.reset(this.player.x, this.player.y);
         toast.lifespan = 2000;
         toast.rotation = this.player.rotation;
